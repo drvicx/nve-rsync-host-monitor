@@ -1,0 +1,18 @@
+[Unit]
+Description=RSync Monitoring Service (Production Version)
+After=network.target
+
+[Service]
+Type=simple
+User=deployer
+Group=deployer
+WorkingDirectory=/opt/apps/nve-rsync-host-monitor
+Environment="PATH=/opt/apps/nve-rsync-host-monitor/venv/bin"
+ExecStart=/opt/apps/nve-rsync-host-monitor/venv/bin/python -m app.main
+Restart=always
+RestartSec=10
+StandardOutput=append:/opt/apps/nve-rsync-host-monitor/logs/service_out.log
+StandardError=append:/opt/apps/nve-rsync-host-monitor/logs/service_err.log
+
+[Install]
+WantedBy=multi-user.target
