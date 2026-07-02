@@ -1,0 +1,19 @@
+# Git Exclusion List
+
+# Python :: Byte-compiled files
+__pycache__/
+
+# Python :: Virtual environment
+venv/*
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# SQLite :: Local Database file
+#data.db
+
+# Application specific :: Logs
+logs/err.log
+logs/out.log
+logs/sync.log

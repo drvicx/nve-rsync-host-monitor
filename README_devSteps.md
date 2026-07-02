@@ -9,12 +9,12 @@
 │   │   └── chart.html           #
 │   │
 │   ├── __init__.py              #
-│   ├── config.py                #
-│   ├── crud.py                  #
-│   ├── database.py              #
-│   ├── main.py                  #
-│   ├── models.py                #
-│   └── schemas.py               #
+│   ├── config.py                # step-001 <
+│   ├── crud.py                  # step-005 <
+│   ├── database.py              # step-002 <
+│   ├── main.py                  # step-006 <
+│   ├── models.py                # step-003 <
+│   └── schemas.py               # step-004 <
 │
 ├── configs/
 │   ├── systemd/                 # 
