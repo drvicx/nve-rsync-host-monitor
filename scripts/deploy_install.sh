@@ -37,7 +37,7 @@ chmod +x scripts/run.sh
 
 echo "6. Configuring and Starting app as systemd service..."
 # Copy service configuration file to systemd directory
-sudo cp systemd/$SERVICE_NAME_CFG /etc/systemd/system/
+sudo cp configs/systemd/$SERVICE_NAME_CFG /etc/systemd/system/
 sudo systemctl daemon-reload
 # Enable and Start python app as a system service
 sudo systemctl enable $SERVICE_NAME
