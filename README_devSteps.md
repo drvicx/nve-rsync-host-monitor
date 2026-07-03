@@ -23,7 +23,7 @@
 │
 ├── data/
 │   ├── backups/                            # step-012.0 <
-│   │   └── monitorDB_20260702_1720.tar.gz  # < step-013
+│   │   └── monitorDB_20260702_1720.tar.gz  # step-013 <
 │   └── monitor.db                          # <
 │
 ├── infra/                                  #
@@ -31,14 +31,16 @@
 │       ├── Dockerfile                      #
 │       └── docker-compose.yaml             #
 │
-├── logs/                                   #
-│   ├── backup.log.example                  # step-012.2 <
-│   ├── service_err.log.example             # step-008.2 <
-│   ├── service_out.log.example             # step-008.3 <
+├── logs/ 
+│   ├── examples/                           #
+│   │   ├── backup.log.example              # step-012.2 <
+│   │   ├── service_err.log.example         # step-008.2 <
+│   │   └── service_out.log.example         # step-008.3 <
 │   └── sync.log                            #
 │
 ├── scripts/
-│   ├── backupDB.sh                         # step-012.1 <
+│   ├── db_backup.sh                        # step-012.1 <
+│   ├── db_restore.sh                       # step-014 <
 │   ├── deploy_install.sh                   # step-010 <
 │   ├── deploy_uninstall.sh                 # step-011 <
 │   └── run.sh                              # step-009 <
