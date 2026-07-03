@@ -1,1 +1,11 @@
-deployer ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/cp * /etc/systemd/system/, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl status nve-rsync-monitor, /usr/bin/systemctl restart nve-rsync-monitor, /usr/bin/systemctl start nve-rsync-monitor, /usr/bin/systemctl stop nve-rsync-monitor
+#v0.1
+#deployer ALL=(ALL) NOPASSWD: /usr/bin/systemctl, /usr/bin/service, /usr/bin/apt
+
+#v0.2
+#deployer ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/cp * /etc/systemd/system/, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl status nve-rsync-monitor, /usr/bin/systemctl restart nve-rsync-monitor, /usr/bin/systemctl start nve-rsync-monitor, /usr/bin/systemctl stop nve-rsync-monitor
+
+#v0.3
+#deployer ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/cp * /etc/systemd/system/, /usr/bin/rm /etc/systemd/system/nve-rsync-monitor.service, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl enable nve-rsync-monitor, /usr/bin/systemctl disable nve-rsync-monitor, /usr/bin/systemctl start nve-rsync-monitor, /usr/bin/systemctl stop nve-rsync-monitor, /usr/bin/systemctl restart nve-rsync-monitor, /usr/bin/systemctl status nve-rsync-monitor, /usr/bin/systemctl reset-failed nve-rsync-monitor, /usr/bin/systemctl mask nve-rsync-monitor
+
+#v0.4 (current)
+deployer ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/cp * /etc/systemd/system/, /usr/bin/rm /etc/systemd/system/nve-rsync-monitor*.service, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl enable nve-rsync-monitor*, /usr/bin/systemctl disable nve-rsync-monitor*, /usr/bin/systemctl start nve-rsync-monitor*, /usr/bin/systemctl stop nve-rsync-monitor*, /usr/bin/systemctl restart nve-rsync-monitor*, /usr/bin/systemctl status nve-rsync-monitor*, /usr/bin/systemctl reset-failed nve-rsync-monitor*

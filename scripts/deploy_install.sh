@@ -33,7 +33,8 @@ echo "4. Creating necessary directories.."
 mkdir -p data logs
 
 echo "5. Setting execution flag to scripts..."
-chmod +x scripts/run.sh
+#chmod +x scripts/run.sh
+chmod 770 scripts/*
 
 echo "6. Configuring and Starting app as systemd service..."
 # Copy service configuration file to systemd directory
@@ -43,12 +44,14 @@ sudo systemctl daemon-reload
 sudo systemctl enable $SERVICE_NAME
 sudo systemctl start $SERVICE_NAME
 sudo systemctl restart $SERVICE_NAME
+sudo systemctl status $SERVICE_NAME
 
 echo "============================================"
 echo "Install complete!"
 echo "To launch the application, run the following commands:"
 echo "  sudo systemctl enable $SERVICE_NAME"
 echo "  sudo systemctl start $SERVICE_NAME"
+echo "  sudo systemctl status $SERVICE_NAME"
 echo ""
 echo "Or execute startup script manually:"
 echo "  ./scripts/run.sh"
