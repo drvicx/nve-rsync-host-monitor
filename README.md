@@ -12,10 +12,34 @@ Monitoring web service for rsync directory synchronization between Source and Ta
 ## Installation
 
 ```bash
-# Clone repository
+# Configure system user and permissions
+- see "configs/sudoers.d/deployer" for example
+
+# Connect to your server with ssh and login by configured user
+- check: whoami && id $(whoami) && sudo cat /etc/sudoers.d/$(whoami)
+
+# Goto apps directory
+cd /opt/apps
+
+# Clone repository and goin repo directory
 git clone https://github.com/drvicx/nve-rsync-host-monitor.git
 cd nve-rsync-host-monitor
 
-# Run install script
-./scripts/install.sh
+# Execute install script
+./scripts/deploy_install.sh
+
+# Check REST Service status locally with "curl" and "jq" tools
+curl -s 127.0.0.1:8010/api/status | jq '.'
+
+# Check Service status response
+{
+    "status": "running",
+    "total_records": 0,
+    "last_update_s": null,
+    "last_update_d": null
+}
+
+# Execute uninstall script
+./scripts/deploy_uninstall.sh
+
 ```
