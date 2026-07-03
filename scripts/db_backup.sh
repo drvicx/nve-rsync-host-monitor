@@ -4,7 +4,7 @@
 
 PROJECT_DIR="/opt/apps/nve-rsync-host-monitor"
 DB_PATH="$PROJECT_DIR/data/monitor.db"
-BACKUP_DIR="$PROJECT_DIR/backups"
+BACKUP_DIR="$PROJECT_DIR/data/backups"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_NAME="monitorDB_${TIMESTAMP}.tar.gz"
 LOG_FILE="$PROJECT_DIR/logs/backup.log"
