@@ -1,0 +1,1 @@
+deployer ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/cp * /etc/systemd/system/, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl status nve-rsync-monitor, /usr/bin/systemctl restart nve-rsync-monitor, /usr/bin/systemctl start nve-rsync-monitor, /usr/bin/systemctl stop nve-rsync-monitor

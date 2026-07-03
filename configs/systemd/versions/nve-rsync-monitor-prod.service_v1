@@ -1,23 +1,18 @@
 [Unit]
 Description=RSync Monitoring Service (Production Version)
 After=network.target
-Wants=network.target
 
 [Service]
 Type=simple
 User=deployer
 Group=deployer
 WorkingDirectory=/opt/apps/nve-rsync-host-monitor
-Environment="PATH=/opt/apps/nve-rsync-host-monitor/venv/bin:/usr/local/bin:/usr/bin:/bin"
-Environment="HOST=0.0.0.0"
-Environment="PORT=8010"
-ExecStart=/opt/apps/nve-rsync-host-monitor/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:8010
-ExecReload=/bin/kill -HUP $MAINPID
+Environment="PATH=/opt/apps/nve-rsync-host-monitor/venv/bin"
+ExecStart=/opt/apps/nve-rsync-host-monitor/venv/bin/python -m app.main
 Restart=always
 RestartSec=10
 StandardOutput=append:/opt/apps/nve-rsync-host-monitor/logs/service_out.log
 StandardError=append:/opt/apps/nve-rsync-host-monitor/logs/service_err.log
-SyslogIdentifier=nve-rsync-monitor
 
 [Install]
 WantedBy=multi-user.target
