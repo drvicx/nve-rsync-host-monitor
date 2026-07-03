@@ -10,7 +10,7 @@ echo "============================================"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 SERVICE_NAME="nve-rsync-monitor-prod"
-SERVICE_NAME_CFG="nve-rsync-monitor-prod.service"
+SERVICE_NAME_CFG="$SERVICE_NAME.service"
 
 cd "$PROJECT_DIR"
 

@@ -14,7 +14,7 @@ SERVICE_NAME_CFG="nve-rsync-monitor-prod.service"
 
 cd "$PROJECT_DIR"
 
-#echo "0. Installing System Packages..."
+echo "0. Installing System Packages..."
 sudo apt update
 sudo apt install -y sqlite3
 sqlite3 --version

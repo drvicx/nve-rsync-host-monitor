@@ -11,7 +11,7 @@ from app.database import get_db, engine, Base
 from app import crud, schemas
 from app.config import LOG_FILE, BASE_DIR
 
-# Настройка логирования
+# Logging Settings
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -22,13 +22,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Создание таблиц
+# Create Database Tables
 Base.metadata.create_all(bind=engine)
 
-# Инициализация приложения
+# Init FastAPI app
 app = FastAPI(title="Directory Monitoring System", version="1.0.0")
 
-# Настройка статики и шаблонов
+# Statics and Templates settings
 static_dir = BASE_DIR / "static"
 static_dir.mkdir(exist_ok=True)
 (static_dir / "css").mkdir(exist_ok=True, parents=True)
@@ -44,13 +44,13 @@ templates = Jinja2Templates(directory=str(templates_dir))
 
 @app.post("/api/data")
 async def receive_data(data: schemas.MonitoringData, db: Session = Depends(get_db)):
-    """Прием данных от серверов S и D"""
+    """Resieve data from Source (S) and Destunation(D) servers"""
     if data.server not in ['S', 'D']:
         raise HTTPException(status_code=400, detail="Invalid server type")
-    
+
     crud.save_stats(db, data.server, data.timestamp, data.data)
     logger.info(f"Received data from server {data.server}: {len(data.data)} directories")
-    
+
     # Проверка синхронизации
     if data.server == 'S':
         comparisons = crud.get_latest_comparison(db)
@@ -61,7 +61,7 @@ async def receive_data(data: schemas.MonitoringData, db: Session = Depends(get_d
                     comp.s_size, comp.d_size,
                     comp.s_files, comp.d_files
                 )
-    
+
     return {"status": "success", "message": f"Data from {data.server} saved"}
 
 @app.get("/api/comparison")
@@ -76,17 +76,17 @@ async def get_history(base_path: str, limit: int = 100, db: Session = Depends(ge
 
 @app.get("/api/status")
 async def get_status(db: Session = Depends(get_db)):
-    """Получить статус системы"""
+    """Get Service status"""
     from app.models import DirectoryStats
     count = db.query(DirectoryStats).count()
     last_s = db.query(DirectoryStats).filter(
         DirectoryStats.server == 'S'
     ).order_by(DirectoryStats.timestamp.desc()).first()
-    
+
     last_d = db.query(DirectoryStats).filter(
         DirectoryStats.server == 'D'
     ).order_by(DirectoryStats.timestamp.desc()).first()
-    
+
     return {
         "status": "running",
         "total_records": count,
@@ -98,12 +98,12 @@ async def get_status(db: Session = Depends(get_db)):
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    """Главная страница с таблицей"""
+    """Main page with Table data"""
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/chart/{base_path:path}", response_class=HTMLResponse)
 async def chart_page(request: Request, base_path: str):
-    """Страница с графиком для конкретного каталога"""
+    """Page with Chart data for a specific Directory"""
     return templates.TemplateResponse(
         "chart.html",
         {"request": request, "base_path": base_path}

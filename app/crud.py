@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def save_stats(db: Session, server: str, timestamp: datetime, data: list[DirData]):
-    """Сохранение статистики от сервера"""
+    """Save servers Directories statistic"""
     for item in data:
         stat = DirectoryStats(
             server=server,
@@ -24,7 +24,7 @@ def save_stats(db: Session, server: str, timestamp: datetime, data: list[DirData
     cleanup_old_data(db)
 
 def cleanup_old_data(db: Session):
-    """Удаление данных старше указанного периода"""
+    """Remove data older then specific period"""
     cutoff_date = datetime.utcnow() - timedelta(days=DATA_RETENTION_DAYS)
     db.query(DirectoryStats).filter(
         DirectoryStats.timestamp < cutoff_date
@@ -32,19 +32,19 @@ def cleanup_old_data(db: Session):
     db.commit()
 
 def get_latest_comparison(db: Session) -> list[DirComparison]:
-    """Получить последнее сравнение для всех каталогов"""
-    # Подзапросы для последних записей S и D
+    """Get last Comparison for all Directories"""
+    # Subqueries for retrieving last records from S и D servers
     subquery_s = db.query(
         DirectoryStats.base_path,
         func.max(DirectoryStats.timestamp).label('max_ts')
     ).filter(DirectoryStats.server == 'S').group_by(DirectoryStats.base_path).subquery()
-    
+
     subquery_d = db.query(
         DirectoryStats.base_path,
         func.max(DirectoryStats.timestamp).label('max_ts')
     ).filter(DirectoryStats.server == 'D').group_by(DirectoryStats.base_path).subquery()
-    
-    # Данные S и D
+
+    # Data from Source (S) and Destination (D) servers
     s_data = db.query(DirectoryStats).join(
         subquery_s,
         and_(
@@ -52,7 +52,7 @@ def get_latest_comparison(db: Session) -> list[DirComparison]:
             DirectoryStats.timestamp == subquery_s.c.max_ts
         )
     ).all()
-    
+
     d_data = db.query(DirectoryStats).join(
         subquery_d,
         and_(
@@ -60,17 +60,17 @@ def get_latest_comparison(db: Session) -> list[DirComparison]:
             DirectoryStats.timestamp == subquery_d.c.max_ts
         )
     ).all()
-    
-    # Словари для быстрого доступа
+
+    # Dictionary for quic access
     s_dict = {item.base_path: item for item in s_data}
     d_dict = {item.base_path: item for item in d_data}
     all_paths = set(s_dict.keys()) | set(d_dict.keys())
-    
+
     result = []
     for base_path in all_paths:
         s_item = s_dict.get(base_path)
         d_item = d_dict.get(base_path)
-        
+
         comparison = DirComparison(
             base_path=base_path,
             s_full_path=s_item.full_path if s_item else None,
@@ -88,32 +88,32 @@ def get_latest_comparison(db: Session) -> list[DirComparison]:
             )
         )
         result.append(comparison)
-    
+
     result.sort(key=lambda x: x.base_path)
     return result
 
 def get_history(db: Session, base_path: str, limit: int = 100) -> list[HistoryPoint]:
-    """Получить историю для конкретного каталога"""
+    """Get History for specific Directory"""
     s_history = db.query(DirectoryStats).filter(
         DirectoryStats.server == 'S',
         DirectoryStats.base_path == base_path
     ).order_by(desc(DirectoryStats.timestamp)).limit(limit).all()
-    
+
     d_history = db.query(DirectoryStats).filter(
         DirectoryStats.server == 'D',
         DirectoryStats.base_path == base_path
     ).order_by(desc(DirectoryStats.timestamp)).limit(limit).all()
-    
+
     s_dict = {item.timestamp: item for item in s_history}
     d_dict = {item.timestamp: item for item in d_history}
-    
+
     all_timestamps = sorted(set(s_dict.keys()) | set(d_dict.keys()), reverse=True)[:limit]
-    
+
     result = []
     for ts in all_timestamps:
         s_item = s_dict.get(ts)
         d_item = d_dict.get(ts)
-        
+
         point = HistoryPoint(
             timestamp=ts,
             s_files=s_item.files_count if s_item else 0,
@@ -122,11 +122,11 @@ def get_history(db: Session, base_path: str, limit: int = 100) -> list[HistoryPo
             d_size=d_item.size_bytes if d_item else 0
         )
         result.append(point)
-    
+
     return result
 
 def log_sync_event(db: Session, base_path: str, s_size: int, d_size: int, s_files: int, d_files: int):
-    """Запись события синхронизации в лог"""
+    """Logging Sync Event"""
     logger.info(
         f"SYNC OK: {base_path} | "
         f"S: {s_files} files, {s_size/1024/1024:.2f}MB | "
