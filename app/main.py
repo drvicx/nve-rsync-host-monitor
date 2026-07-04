@@ -51,7 +51,7 @@ async def receive_data(data: schemas.MonitoringData, db: Session = Depends(get_d
     crud.save_stats(db, data.server, data.timestamp, data.data)
     logger.info(f"Received data from server {data.server}: {len(data.data)} directories")
 
-    # Проверка синхронизации
+    # Checking Sync
     if data.server == 'S':
         comparisons = crud.get_latest_comparison(db)
         for comp in comparisons:
@@ -66,12 +66,12 @@ async def receive_data(data: schemas.MonitoringData, db: Session = Depends(get_d
 
 @app.get("/api/comparison")
 async def get_comparison(db: Session = Depends(get_db)):
-    """Получить текущее состояние сравнения всех каталогов"""
+    """Get current comparison state: all directories"""
     return crud.get_latest_comparison(db)
 
 @app.get("/api/history/{base_path:path}")
 async def get_history(base_path: str, limit: int = 100, db: Session = Depends(get_db)):
-    """Получить историю для конкретного каталога"""
+    """Get specific directory history"""
     return crud.get_history(db, base_path, limit)
 
 @app.get("/api/status")
@@ -87,11 +87,19 @@ async def get_status(db: Session = Depends(get_db)):
         DirectoryStats.server == 'D'
     ).order_by(DirectoryStats.timestamp.desc()).first()
 
+    # Retrieves current Date and Time in ISO format
+    current_time = datetime.now().isoformat()
+
     return {
+        "serverDateTime": current_time,
         "status": "running",
+        "status_code": 200,
+
         "total_records": count,
         "last_update_s": last_s.timestamp if last_s else None,
-        "last_update_d": last_d.timestamp if last_d else None
+        "last_update_d": last_d.timestamp if last_d else None,
+
+        "debugMessage": "test_20260704_1",
     }
 
 # ==================== WEB INTERFACE ====================
