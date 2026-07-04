@@ -95,7 +95,11 @@ jobs:
               fi
 
               cd "$PROJECT_DIR"
-              echo "Pulling latest changes..."
+              #
+              echo "Download all changes fron remote..."
+              git fetch
+              #
+              echo "Pulling latest changes to current branch (main)..."
               git pull
             }
 
