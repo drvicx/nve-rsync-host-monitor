@@ -1,0 +1,135 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+  #
+  workflow_dispatch:
+    # Keeps an option for manual launch with selection
+    inputs:
+      deployment_type:
+        description: 'Deploy Type'
+        required: true
+        default: 'update'
+        type: choice
+        options:
+          - update
+          - clean
+
+# UserDefinedParameter [DeployMode]:
+# - update: updates existing code in project dir
+# - clean:  removes app service and project dir, then clone repo and starts app service
+#
+env:
+  DEPLOYMENT_TYPE: 'update'
+  PROJECT_DIR: '/opt/apps/nve-rsync-host-monitor'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOYER_USER_PKEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p ${{ secrets.DEPLOYER_HOST_PORT }} ${{ secrets.DEPLOYER_HOST_FDQN }} >> ~/.ssh/known_hosts
+
+      - name: Deploy application
+        env:
+          # ChoseDeployTypePriority: If runs manually, param takes from GitHub repo Variables, otherwise from Env
+          DEPLOY_TYPE: ${{ github.event.inputs.deployment_type || env.DEPLOYMENT_TYPE }}
+
+        run: |
+          ssh -p ${{ secrets.DEPLOYER_HOST_PORT }} \
+              ${{ secrets.DEPLOYER_USER_NAME }}@${{ secrets.DEPLOYER_HOST_FDQN }} << 'EOF'
+            set -e
+
+            DEPLOY_TYPE="${{ env.DEPLOY_TYPE }}"
+            PROJECT_DIR="${{ env.PROJECT_DIR }}"
+
+            echo "-- Starting deployment (Type: $DEPLOY_TYPE) --"
+
+            # == Function for Clean Deploy ==
+            clean_deploy() {
+              echo "-- Performing CLEAN deployment --"
+
+              # Check project directory on server
+              if [ -d "$PROJECT_DIR" ]; then
+                cd "$PROJECT_DIR"
+
+                # Run undeploy script if exists
+                if [ -f "scripts/deploy_uninstall.sh" ]; then
+                  echo "Running deploy_uninstall.sh..."
+                  chmod +x scripts/deploy_uninstall.sh
+                  ./scripts/deploy_uninstall.sh
+                else
+                  echo "WARNING: deploy_uninstall.sh script not found!"
+                fi
+              else
+                echo "Project directory does not exist, nothing to clean"
+              fi
+
+              # Clone Repo
+              echo "Cloning repository..."
+              cd /opt/apps
+              git clone https://github.com/drvicx/nve-rsync-host-monitor.git
+              cd "$PROJECT_DIR"
+            }
+
+            # == Function for Update Deploy ==
+            update_deploy() {
+              echo "-- Performing UPDATE deployment --"
+
+              if [ ! -d "$PROJECT_DIR" ]; then
+                echo "Project directory not found. Performing clean deploy instead..."
+                clean_deploy
+                return
+              fi
+
+              cd "$PROJECT_DIR"
+              echo "Pulling latest changes..."
+              git pull
+            }
+
+            # == Deploy Type Choose (clean, update) ==
+            if [ "$DEPLOY_TYPE" = "clean" ]; then
+              clean_deploy
+            else
+              update_deploy
+            fi
+
+            # == Common Steps (execute install script and start service) ==
+            echo "Running deploy_install.sh..."
+            chmod +x scripts/deploy_install.sh
+            ./scripts/deploy_install.sh
+
+            echo "✓ Deployment completed!"
+          EOF
+
+      - name: Verify deployment
+        run: |
+          echo "-- Waiting for service to start... --"
+          sleep 15
+
+          for i in {1..15}; do
+            echo -n "Attempt $i/15... "
+            if curl -f -s -o /dev/null -w "Status: %{http_code}\n" \
+              --connect-timeout 5 \
+              --max-time 10 \
+              https://notcloud.ru/apps/esrn-rsync-monitoring-prod/api/status; then
+              echo "✓ Service is running"
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "✗ Service failed to start"
+          exit 1
