@@ -33,10 +33,13 @@ curl -s 127.0.0.1:8010/api/status | jq '.'
 
 # Check Service status response
 {
-    "status": "running",
-    "total_records": 0,
-    "last_update_s": null,
-    "last_update_d": null
+  "status": "running",
+  "status_code": 200,
+  "total_records": 0,
+  "last_update_s": null,
+  "last_update_d": null,
+  "debugMessage": "test_20260704_1",
+  "serverDateTime": "2026-07-05T10:39:48.962264"
 }
 
 # Execute uninstall script

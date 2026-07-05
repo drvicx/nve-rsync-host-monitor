@@ -60,7 +60,7 @@
 ├── .gitignore                              #
 ├── LICENSE                                 #
 ├── README_structure.md                     #
-├── README.md                               #
+├── README.md                               # <
 └── requirements.txt                        # step-007
 
 ```
