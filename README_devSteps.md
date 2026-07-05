@@ -3,9 +3,9 @@
 ```
 /nve-rsync-host-monitor/                    # root project directory
 │
-├── .github/                                # step-015 <
-│   └── workflows/                          # step-016 <
-│       └── deploy.yaml                     # step-017 <
+├── .github/                                # step-015
+│   └── workflows/                          # step-016
+│       └── deploy.yaml                     # step-017,019 <
 │
 ├── app/
 │   ├── templates/                          #
@@ -16,7 +16,7 @@
 │   ├── config.py                           # step-001
 │   ├── crud.py                             # step-005
 │   ├── database.py                         # step-002
-│   ├── main.py                             # step-006,018 <
+│   ├── main.py                             # step-006,018
 │   ├── models.py                           # step-003
 │   └── schemas.py                          # step-004
 │
